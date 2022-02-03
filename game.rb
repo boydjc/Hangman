@@ -1,7 +1,8 @@
 class Game
   def initialize()
-    @chosenWord = nil
+    @chosenWord = ""
 	@guessCount = 0
+	@maxGuesses = 5
 	@prevLetters = ['a', 'e', 'i', 'o', 'u']
   end
 
@@ -9,26 +10,36 @@ class Game
   # a random word for the player to guess
   def getRandWord()
     file = File.open("word_dictionary.txt", "r")
-    wordSelection = rand(0..file.count)
-	file.rewind
-    fileLineCount = 0
-	while !file.eof?
-	  line = file.readline
-	  if fileLineCount == wordSelection
-	    @chosenWord = line
+	while (@chosenWord == "")
+	  file.rewind
+      wordSelection = rand(0..file.count)
+	  file.rewind
+      fileLineCount = 0
+	  while !file.eof?
+	    line = file.readline
+	    if fileLineCount == wordSelection
+		  if line.length > 5 and line.length < 12
+	        @chosenWord = line
+		  end
+	    end
+	    fileLineCount += 1
 	  end
-	  fileLineCount += 1
 	end
   end
 
   # displays blanks along with any correctly
   # guessed letters belonging to the chosen word
   def displayWord()
+    puts "You have #{@maxGuesses - @guessCount} guesses left."
+	puts '-------------------------------------'
+	puts "Letters guessed"
+	p @prevLetters
+	puts '-------------------------------------'
     @chosenWord.each_char do |letter|
 	  if !@prevLetters.include?(letter)
-	    print "_"
+	    print " _"
 	  else
-	    print letter
+	    print " #{letter}"
 	  end
 	end
 	print "\n"
