@@ -1,0 +1,7 @@
+--- !ruby/object:Game
+chosenWord: vitamin
+guessCount: 1
+maxGuesses: 12
+prevLetters: []
+correctLetters: []
+gameOver: false
