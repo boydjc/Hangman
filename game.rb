@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Game
   def initialize()
     @chosenWord = ""
@@ -6,6 +8,25 @@ class Game
 	@prevLetters = []
 	@correctLetters = []
 	@gameOver = false
+  end
+
+  def serialize(file_name)
+    success = false
+    serialized = YAML::dump(self)
+	if !File.exists?("./saves/#{file_name}")
+	  newSave = File.open("./saves/#{file_name}.yaml", "w")
+	  newSave.puts serialized
+	  newSave.close
+	  success = true
+	else
+	  puts "That save file already exists. Please use another name."
+	end
+
+	return success
+  end
+
+  def self.deserialize(yaml_string)
+    YAML::load(yaml_string)
   end
 
   # looks through the word dictionary and selects
@@ -29,6 +50,30 @@ class Game
 	end
   end
 
+  # saves the game state with a given filename
+  def saveGame()
+    fileSaved = false
+    while !fileSaved
+      puts "Please enter your file save name"
+      puts "Enter 'cancel' to cancel saving"
+	  print ":"
+	  fileName = gets().chomp()
+	  fileName.downcase!
+	  if fileName != 'cancel'
+	    if File.exists?("./saves/#{fileName}.yaml")
+		  clearScreen()
+		  puts "Sorry. A save file with that name already exists."
+		else
+	      fileSaved = serialize(fileName)
+	      puts "File Saved Successfully!"
+		  @gameOver = true
+		end
+	  else
+	    break
+	  end
+    end
+  end
+
   # displays blanks along with any correctly
   # guessed letters belonging to the chosen word
   def displayWord()
@@ -49,9 +94,9 @@ class Game
 
   def getUserLetter()
     userLetter = nil
-	@guessCount += 1
 	while userLetter == nil
       puts "Please enter one letter to guess"
+	  puts "(Enter 'save' to save your game)"
 	  print ":"
       potentialLetter = gets().chomp()
 	  potentialLetter.downcase!
@@ -59,16 +104,22 @@ class Game
 	  !potentialLetter.match?(/[[:digit:]]/) and 
       !@prevLetters.include?(potentialLetter) and
 	  potentialLetter.length == 1
+	    @guessCount += 1
 	    userLetter = potentialLetter
 		@prevLetters.push(userLetter)
 	  else
 	    clearScreen()
-	    if potentialLetter.match?(/[[:digit:]]/)
-	      puts "Sorry. That is not valid input."
-		elsif @prevLetters.include?(potentialLetter)
-		  puts "You have already guessed that letter."
-		elsif !potentialLetter.length == 1 
-		  puts "You can only input one letter"
+		if potentialLetter == 'save'
+		  userLetter = potentialLetter
+          saveGame()
+        else
+		  if potentialLetter.match?(/[[:digit:]]/)
+	        puts "Sorry. That is not valid input."
+		  elsif @prevLetters.include?(potentialLetter)
+		    puts "You have already guessed that letter."
+		  elsif !potentialLetter.length == 1
+		    puts "You can only input one letter"
+		  end
 		end
 		displayWord()
 	  end
