@@ -10,9 +10,29 @@ class Game
 	@gameOver = false
   end
 
+  public
+  def self.deserialize(yaml_string)
+    YAML.unsafe_load(yaml_string)
+  end
+
+# main game loop
+  def startGame()
+    getRandWord()
+    while !@gameOver
+	  checkForWin()
+	  displayWord()
+	  if !@gameOver
+	    userLetter = getUserLetter()
+        checkLetter(userLetter)
+	    clearScreen()
+	  end
+	end
+  end
+
+  private
   def serialize(file_name)
     success = false
-    serialized = YAML::dump(self)
+    serialized = YAML.dump(self)
 	if !File.exists?("./saves/#{file_name}")
 	  newSave = File.open("./saves/#{file_name}.yaml", "w")
 	  newSave.puts serialized
@@ -21,12 +41,7 @@ class Game
 	else
 	  puts "That save file already exists. Please use another name."
 	end
-
 	return success
-  end
-
-  def self.deserialize(yaml_string)
-    YAML::load(yaml_string)
   end
 
   # looks through the word dictionary and selects
@@ -154,27 +169,9 @@ class Game
 	  @gameOver = true
 	end
   end
-
-  # clears the console screen
-  def clearScreen()
-    print "\e[2J\e[f"
-  end
-
-  # main game loop
-  def startGame()
-    getRandWord()
-    while !@gameOver
-	  checkForWin()
-	  displayWord()
-	  if !@gameOver
-	    userLetter = getUserLetter()
-        checkLetter(userLetter)
-	    clearScreen()
-	  end
-	end
-  end
 end
 
-g = Game.new()
-
-g.startGame()
+# clears the console screen
+def clearScreen()
+  print "\e[2J\e[f"
+end

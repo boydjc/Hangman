@@ -1,6 +1,6 @@
 --- !ruby/object:Game
 chosenWord: crossword
-guessCount: 5
+guessCount: 9
 maxGuesses: 12
 prevLetters:
 - a
@@ -8,6 +8,12 @@ prevLetters:
 - i
 - o
 - u
+- d
+- f
+- w
+- q
 correctLetters:
 - o
+- d
+- w
 gameOver: false
